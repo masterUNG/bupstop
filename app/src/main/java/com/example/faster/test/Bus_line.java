@@ -3,18 +3,20 @@ package com.example.faster.test;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -39,6 +41,16 @@ public class Bus_line extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bus_line);
+
+        //Create ListView
+        createListView();
+
+        //About Toolbar
+        aboutToolbar();
+
+    }   // Main Method
+
+    private void aboutToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //รับค่าจาก activity อื่น
@@ -53,6 +65,41 @@ public class Bus_line extends ActionBarActivity
                     .build();
         }
     }
+
+    private void createListView() {
+
+        ListView listView = (ListView) findViewById(R.id.livShowBus);
+
+        try {
+
+            //Connected SQLite for Read All Data
+            SQLiteDatabase sqLiteDatabase = openOrCreateDatabase("Busstop.db",
+                    MODE_PRIVATE, null);
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM busTABLE", null);
+            cursor.moveToFirst();
+
+            String[] numberBusStrings = new String[cursor.getCount()];
+            String[] detailBusStrings = new String[cursor.getCount()];
+
+            for (int i=0; i<cursor.getCount(); i+=1) {
+
+                numberBusStrings[i] = cursor.getString(1);
+                detailBusStrings[i] = cursor.getString(2);
+                Log.d("5JulyV2", "numberBus[" + i + "] ==> " + numberBusStrings[i]);
+                cursor.moveToNext();
+
+            }   // for
+
+            BusAdapter busAdapter = new BusAdapter(Bus_line.this,
+                    numberBusStrings, detailBusStrings);
+            listView.setAdapter(busAdapter);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }   // createListView
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

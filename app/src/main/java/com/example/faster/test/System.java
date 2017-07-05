@@ -1,7 +1,9 @@
 package com.example.faster.test;
 
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -21,10 +23,31 @@ public class System extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_system);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Toast.makeText(this,"เลือกระบบการใช้งาน ออนไลน์ กดด้านซ้ายของหน้าจอ ออฟไลน์ กดด้านขวาของหน้าจอ",Toast.LENGTH_SHORT).show();
+
+
+        //Check GPS
+        checkGPS();
+
+
+    }   // Main Method
+
+    private void checkGPS() {
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        boolean bolGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+        if (!bolGPS) {
+            //Not Open GPS
+            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivity(intent);
+        }
+
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
